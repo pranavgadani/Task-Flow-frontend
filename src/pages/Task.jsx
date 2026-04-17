@@ -935,7 +935,8 @@ export default function Task({ isIssue = false }) {
         onSave={save}
         loading={loading}
       >
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ maxHeight: '65vh', overflowY: 'auto', overflowX: 'visible', padding: '10px 5px 200px 5px' }}>
+
           <label style={{ fontWeight: "700", display: "block", marginBottom: "8px", fontSize: "14px", color: "var(--text-main)" }}>Title <span style={{ color: "red" }}>*</span></label>
           <input
             className="form-control"
@@ -1257,6 +1258,7 @@ export default function Task({ isIssue = false }) {
             </button>
           </div>
         )}
+        </div>
       </FormModal>
 
       {/* ================= DATA VIEW (LIST / KANBAN) ================= */}
