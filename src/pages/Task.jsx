@@ -936,6 +936,7 @@ export default function Task({ isIssue = false }) {
         loading={loading}
       >
         <div style={{ maxHeight: '65vh', overflowY: 'auto', overflowX: 'visible', padding: '10px 5px 200px 5px' }}>
+          <div style={{ marginBottom: "20px" }}>
 
           <label style={{ fontWeight: "700", display: "block", marginBottom: "8px", fontSize: "14px", color: "var(--text-main)" }}>Title <span style={{ color: "red" }}>*</span></label>
           <input
