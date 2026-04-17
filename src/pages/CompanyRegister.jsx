@@ -86,7 +86,11 @@ export default function CompanyRegister() {
             const formData = new FormData();
             Object.keys(form).forEach(key => {
                 if (key !== 'confirmPassword') {
-                    formData.append(key, ['gstNumber', 'panNumber'].includes(key) && form[key] ? form[key].toUpperCase() : form[key]);
+                    let val = form[key];
+                    if (key === 'contactPersonEmail' && !val) {
+                        val = form.email;
+                    }
+                    formData.append(key, ['gstNumber', 'panNumber'].includes(key) && val ? val.toUpperCase() : val);
                 }
             });
             if (logo) formData.append("appLogo", logo);
