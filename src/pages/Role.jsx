@@ -301,125 +301,127 @@ export default function Role() {
         saveText={editId ? "Update" : "Save"}
         maxWidth="800px"
       >
-        <div style={{ display: 'flex', gap: '30px', marginBottom: '15px' }}>
-          <TextInput
-            label="Role Name"
-            placeholder="Enter role name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            maxLength={50}
-            required
-            className="role-name-field"
-            style={{ flex: 1 }}
-          />
+        <div style={{ maxHeight: '70vh', overflowY: 'auto', padding: '10px 10px 30px 10px' }}>
+          <div style={{ display: 'flex', gap: '30px', marginBottom: '15px' }}>
+            <TextInput
+              label="Role Name"
+              placeholder="Enter role name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              maxLength={50}
+              required
+              className="role-name-field"
+              style={{ flex: 1 }}
+            />
 
-          <SelectField
-            label="Status"
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-            options={[
-              { value: "", label: "Select Status" },
-              { value: "Active", label: "Active" },
-              { value: "Inactive", label: "Inactive" },
-            ]}
-            required
-            style={{ flex: 1 }}
-          />
-        </div>
+            <SelectField
+              label="Status"
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
+              options={[
+                { value: "", label: "Select Status" },
+                { value: "Active", label: "Active" },
+                { value: "Inactive", label: "Inactive" },
+              ]}
+              required
+              style={{ flex: 1 }}
+            />
+          </div>
 
-        <div className="form-group" style={{ marginTop: '30px' }}>
-          <label style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-main)', marginBottom: '12px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Permissions Matrix
-          </label>
-          <div className="permissions-table-container" style={{
-            background: 'var(--ui-surface)',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            border: '1px solid var(--ui-border)',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
+          <div className="form-group" style={{ marginTop: '30px' }}>
+            <label style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-main)', marginBottom: '12px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Permissions Matrix
+            </label>
+            <div className="permissions-table-container" style={{
+              background: 'var(--ui-surface)',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              border: '1px solid var(--ui-border)',
+              boxShadow: 'var(--shadow-sm)'
             }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--ui-border)', background: 'var(--ui-bg)' }}>
-                  <th style={{
-                    padding: '14px 20px',
-                    textAlign: 'left',
-                    color: 'var(--text-muted)',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}>
-                    Module
-                  </th>
-                  <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>All</th>
-                  <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Read</th>
-                  <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Create</th>
-                  <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Update</th>
-                  <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {permissions.map(permission => {
-                  const currentPermission = form.permissions.find(p => p.value === permission.value);
-                  return (
-                    <tr key={permission._id} style={{ borderBottom: '1px solid var(--ui-border)' }}>
-                      <td style={{
-                        padding: '12px 20px',
-                        color: 'var(--text-main)',
-                        fontWeight: '500',
-                        fontSize: '13.5px',
-                      }}>
-                        {permission.name}
-                      </td>
-                      <td style={{ padding: '12px 10px', textAlign: 'center' }}>
-                        <input
-                          type="checkbox"
-                          checked={currentPermission?.all || false}
-                          onChange={(e) => handlePermissionChange(permission._id, 'all', e.target.checked)}
-                          style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
-                        />
-                      </td>
-                      <td style={{ padding: '12px 10px', textAlign: 'center' }}>
-                        <input
-                          type="checkbox"
-                          checked={currentPermission?.read || false}
-                          onChange={(e) => handlePermissionChange(permission._id, 'read', e.target.checked)}
-                          style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
-                        />
-                      </td>
-                      <td style={{ padding: '12px 10px', textAlign: 'center' }}>
-                        <input
-                           type="checkbox"
-                           checked={currentPermission?.create || false}
-                           onChange={(e) => handlePermissionChange(permission._id, 'create', e.target.checked)}
-                           style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
-                        />
-                      </td>
-                      <td style={{ padding: '12px 10px', textAlign: 'center' }}>
-                        <input
-                          type="checkbox"
-                          checked={currentPermission?.update || false}
-                          onChange={(e) => handlePermissionChange(permission._id, 'update', e.target.checked)}
-                          style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
-                        />
-                      </td>
-                      <td style={{ padding: '12px 10px', textAlign: 'center' }}>
-                         <input
-                           type="checkbox"
-                           checked={currentPermission?.delete || false}
-                           onChange={(e) => handlePermissionChange(permission._id, 'delete', e.target.checked)}
-                           style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
-                         />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+              }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--ui-border)', background: 'var(--ui-bg)' }}>
+                    <th style={{
+                      padding: '14px 20px',
+                      textAlign: 'left',
+                      color: 'var(--text-muted)',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}>
+                      Module
+                    </th>
+                    <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>All</th>
+                    <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Read</th>
+                    <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Create</th>
+                    <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Update</th>
+                    <th style={{ padding: '14px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase' }}>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {permissions.map(permission => {
+                    const currentPermission = form.permissions.find(p => p.value === permission.value);
+                    return (
+                      <tr key={permission._id} style={{ borderBottom: '1px solid var(--ui-border)' }}>
+                        <td style={{
+                          padding: '12px 20px',
+                          color: 'var(--text-main)',
+                          fontWeight: '500',
+                          fontSize: '13.5px',
+                        }}>
+                          {permission.name}
+                        </td>
+                        <td style={{ padding: '12px 10px', textAlign: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={currentPermission?.all || false}
+                            onChange={(e) => handlePermissionChange(permission._id, 'all', e.target.checked)}
+                            style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px 10px', textAlign: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={currentPermission?.read || false}
+                            onChange={(e) => handlePermissionChange(permission._id, 'read', e.target.checked)}
+                            style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px 10px', textAlign: 'center' }}>
+                          <input
+                             type="checkbox"
+                             checked={currentPermission?.create || false}
+                             onChange={(e) => handlePermissionChange(permission._id, 'create', e.target.checked)}
+                             style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px 10px', textAlign: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={currentPermission?.update || false}
+                            onChange={(e) => handlePermissionChange(permission._id, 'update', e.target.checked)}
+                            style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px 10px', textAlign: 'center' }}>
+                           <input
+                             type="checkbox"
+                             checked={currentPermission?.delete || false}
+                             onChange={(e) => handlePermissionChange(permission._id, 'delete', e.target.checked)}
+                             style={{ accentColor: 'var(--primary-color)', cursor: 'pointer' }}
+                           />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </FormModal>
