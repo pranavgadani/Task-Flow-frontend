@@ -3,6 +3,7 @@ import API from "../api/api";
 import { useAuth } from "../contexts/AuthContext";
 import { usePermissions } from "../contexts/PermissionContext";
 import { useCompany } from "../contexts/CompanyContext";
+import { useProject } from "../contexts/ProjectContext";
 import DataTable from "../components/common/DataTable";
 import FormModal from "../components/common/FormModal";
 import PageHeader from "../components/common/PageHeader";
@@ -27,6 +28,7 @@ export default function Client() {
   const { user } = useAuth();
   const { hasPermission: ctxHasPermission } = usePermissions();
   const { selectedCompany } = useCompany();
+  const { selectedProject } = useProject();
 
   const isSuperAdmin =
     user?.email === "gadanipranav@gmail.com" || user?.role?.name === "Super Admin";
