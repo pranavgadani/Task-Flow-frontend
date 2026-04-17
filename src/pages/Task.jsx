@@ -111,50 +111,48 @@ export default function Task({ isIssue = false }) {
   // ================= LOAD =================
   const load = async () => {
     try {
-      const [t, st, p, s] = await Promise.all([
-        selectedProject
+      // 1. Fetch Tasks (Primary)
+      try {
+        const t = await (selectedProject
           ? API.get(`/tasks?project=${selectedProject._id}&type=${isIssue ? "issue" : "task"}&page=${serverPage}&limit=${serverPageSize}`)
-          : API.get(`/tasks?type=${isIssue ? "issue" : "task"}&page=${serverPage}&limit=${serverPageSize}`),
-        selectedProject
-          ? API.get(`/task-status?project=${selectedProject._id}`)
-          : API.get("/task-status"),
-        API.get("/projects"),
-        API.get("/staff"),
-      ]);
+          : API.get(`/tasks?type=${isIssue ? "issue" : "task"}&page=${serverPage}&limit=${serverPageSize}`));
+        
+        let rawTasks = [];
+        if (t.data && t.data.tasks) {
+          rawTasks = t.data.tasks;
+          setTotalRecords(t.data.totalCount || 0);
+        } else {
+          rawTasks = Array.isArray(t.data) ? t.data : [];
+          setTotalRecords(rawTasks.length);
+        }
+        const filteredTasks = isIssue
+          ? rawTasks.filter(task => task.type === "issue")
+          : rawTasks.filter(task => task.type === "task" || !task.type);
+        setTasks(filteredTasks);
+      } catch (err) { console.error("Error loading tasks:", err); }
 
-      // ✅ Double safety: also filter by type on client side
-      // Issue page: only show type="issue"
-      // Task page: show type="task" OR no type (old data)
-      let rawTasks = [];
-      if (t.data && typeof t.data === 'object' && !Array.isArray(t.data) && t.data.tasks) {
-        // Handle paginated response
-        rawTasks = t.data.tasks;
-        setTotalRecords(t.data.totalCount || 0);
-      } else {
-        // Handle unpaginated standard array response (safeguard)
-        rawTasks = Array.isArray(t.data) ? t.data : [];
-        setTotalRecords(rawTasks.length);
-      }
+      // 2. Fetch Statuses
+      try {
+        const st = await (selectedProject ? API.get(`/task-status?project=${selectedProject._id}`) : API.get("/task-status"));
+        setStatuses(st.data || []);
+      } catch (err) { console.error("Error loading statuses:", err); }
 
-      const filteredTasks = isIssue
-        ? rawTasks.filter(task => task.type === "issue")
-        : rawTasks.filter(task => task.type === "task" || !task.type);
+      // 3. Fetch Projects
+      try {
+        const p = await API.get("/projects");
+        setProjects(p.data || []);
+      } catch (err) { console.error("Error loading projects:", err); }
 
-      setTasks(filteredTasks);
-      setStatuses(st.data || []);
-      setProjects(p.data || []);
+      // 4. Fetch Staff (The critical part)
+      try {
+        const s = await API.get("/staff");
+        const staffData = s.data.staff || s.data || [];
+        console.log("DEBUG: Staff data list is ->", staffData);
+        setStaff(staffData);
+      } catch (err) { console.error("Error loading staff:", err); }
 
-      // Filter staff based on selected project's 'assignedTo' list (if a project is selected)
-      const allStaff = s.data || [];
-      if (selectedProject && selectedProject.assignedTo && selectedProject.assignedTo.length > 0) {
-        const assignedIds = selectedProject.assignedTo.map(u => u._id || u);
-        // Show only staff/managers who are assigned to this project
-        setStaff(allStaff.filter(user => assignedIds.includes(user._id)));
-      } else {
-        setStaff(allStaff);
-      }
     } catch (e) {
-      console.log(e);
+      console.error("General load error:", e);
     }
   };
 
@@ -499,12 +497,7 @@ export default function Task({ isIssue = false }) {
 
   // ================= HELPER: filter valid staff (Staff + Manager roles) =================
   const getValidStaff = () => {
-    return staff.filter(s => {
-      const pos = (s.position || "").toLowerCase();
-      const roleName = (s.role?.name || "").toLowerCase();
-      return pos.includes("staff") || pos.includes("manager") ||
-        roleName.includes("staff") || roleName.includes("manager");
-    });
+    return Array.isArray(staff) ? staff : (staff.staff || []);
   };
 
   // ================= PRIORITY COLOR =================
@@ -1010,10 +1003,10 @@ export default function Task({ isIssue = false }) {
 
         <div className="form-group">
           <label>Assign Staff <span style={{ color: "red" }}>*</span></label>
-          <div style={{ position: 'relative' }} ref={dropdownRef}>
-            <div style={{ position: "relative" }}>
-               <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" x2="16.65" y1="21" y2="16.65" /></svg>
+          <div style={{ position: 'relative', zIndex: 1050 }} ref={dropdownRef}>
+            <div style={{ position: "relative", marginBottom: "8px" }}>
+               <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8", display: "flex", alignItems: "center" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" x2="16.65" y1="21" y2="16.65" /></svg>
                </span>
                <input
                  type="text"
@@ -1021,8 +1014,9 @@ export default function Task({ isIssue = false }) {
                  placeholder={form.assignedTo ? "Change staff member..." : "Choose a staff member..."}
                  value={memberSearch}
                  onFocus={() => setIsDropdownOpen(true)}
+                 onClick={() => setIsDropdownOpen(true)}
                  onChange={(e) => setMemberSearch(e.target.value)}
-                 style={{ paddingLeft: '42px' }}
+                 style={{ paddingLeft: '48px', height: '48px', boxShadow: 'var(--shadow-sm)', cursor: 'text' }}
                />
             </div>
 
@@ -1044,19 +1038,28 @@ export default function Task({ isIssue = false }) {
 
             {/* Dropdown List */}
             {isDropdownOpen && (
-              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100, background: "#ffffff", borderRadius: "12px", maxHeight: "180px", overflowY: "auto", boxShadow: "var(--shadow-lg)", marginTop: "8px", border: "1px solid var(--ui-border)", padding: "4px" }}>
+              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 9999, background: "#ffffff", borderRadius: "12px", maxHeight: "250px", overflowY: "auto", boxShadow: "0 10px 25px rgba(0,0,0,0.15)", marginTop: "8px", border: "1px solid var(--ui-border)", padding: "4px" }}>
                 {getValidStaff()
-                  .filter(s => s.name?.toLowerCase().includes(memberSearch.toLowerCase()))
-                  .map(s => (
-                      <div
-                        key={s._id}
-                        onClick={() => { setForm({ ...form, assignedTo: s._id }); setMemberSearch(""); setIsDropdownOpen(false); }}
-                        style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 12px", cursor: "pointer", borderRadius: "8px", background: form.assignedTo === s._id ? "var(--primary-light)" : "transparent" }}
-                      >
-                         <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800" }}>{s.name?.charAt(0).toUpperCase()}</div>
-                         <div style={{ fontWeight: "600", fontSize: "14px" }}>{s.name}</div>
-                      </div>
-                  ))}
+                  .filter(s => s.name?.toLowerCase().includes(memberSearch.toLowerCase())).length > 0 ? (
+                    getValidStaff()
+                      .filter(s => s.name?.toLowerCase().includes(memberSearch.toLowerCase()))
+                      .map(s => (
+                          <div
+                            key={s._id}
+                            onClick={() => { setForm({ ...form, assignedTo: s._id }); setMemberSearch(""); setIsDropdownOpen(false); }}
+                            style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 12px", cursor: "pointer", borderRadius: "8px", background: form.assignedTo === s._id ? "var(--primary-light)" : "transparent" }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "var(--primary-light)"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = form.assignedTo === s._id ? "var(--primary-light)" : "transparent"}
+                          >
+                             <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "var(--primary-color)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800" }}>{s.name?.charAt(0).toUpperCase()}</div>
+                             <div style={{ fontWeight: "600", fontSize: "14px", color: "var(--text-main)" }}>{s.name}</div>
+                          </div>
+                      ))
+                  ) : (
+                    <div style={{ padding: "12px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>
+                       {staff.length === 0 ? "Loading users..." : "No members found"}
+                    </div>
+                  )}
               </div>
             )}
           </div>
