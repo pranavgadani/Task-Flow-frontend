@@ -945,6 +945,7 @@ export default function Task({ isIssue = false }) {
         title={editId ? (isIssue ? "Edit Issue" : "Edit Task") : (isIssue ? "Add Issue" : "Add Task")}
         onSave={save}
         loading={loading}
+        maxWidth="95%"
       >
         <div style={{ maxHeight: '70vh', overflowY: 'auto', overflowX: 'visible', padding: '10px 10px 40px 10px' }}>
           <div style={{ marginBottom: "20px" }}>
