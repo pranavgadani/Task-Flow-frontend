@@ -16,6 +16,7 @@ import Team from "./pages/Team";
 import Document from "./pages/Document";
 import ResetPassword from "./pages/ResetPassword";
 import CompanyRegister from "./pages/CompanyRegister";
+import ForgotPassword from "./pages/ForgotPassword";
 import CompanyList from "./pages/CompanyList";
 import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
@@ -59,6 +60,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/register-company" element={<CompanyRegister />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* PROTECTED ROUTES */}
       <Route
