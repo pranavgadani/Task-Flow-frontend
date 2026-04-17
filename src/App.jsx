@@ -26,10 +26,7 @@ import { CompanyProvider } from "./contexts/CompanyContext";
 
 // ============ Inner component (uses AuthContext + PermissionContext) ============
 function AppRoutes() {
-  // 🧹 Clean up old localStorage keys (no longer needed)
-  localStorage.removeItem("permissions");
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+
 
   const { user, loading: authLoading } = useAuth();
   const { hasPermission: ctxHasPermission, loading: permissionLoading } = usePermissions();

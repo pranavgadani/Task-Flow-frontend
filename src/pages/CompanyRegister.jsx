@@ -98,6 +98,7 @@ export default function CompanyRegister() {
             const res = await API.post("/companies/register", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
+            if (res.data.token) localStorage.setItem("token", res.data.token);
             if (res.data.staff) login(res.data.staff);
             showToast("Registration Successful!");
             navigate("/profile?tab=subscription&new=1");
